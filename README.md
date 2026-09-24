@@ -114,11 +114,11 @@ nyc-taxi-analytics/
 ├── models/
 │   ├── staging/
 │   │   ├── stg_taxi_yellow_trips.sql
-│   │   ├── stg_taxi_yellow_trips.yml
+│   │   ├── stg_models.yml
 │   │   └── sources.yml
 │   ├── intermediate/
 │   │   ├── int_trips_enriched.sql
-│   │   └── _intermediate__models.yml
+│   │   └── int_models.yml
 │   └── marts/
 │       ├── fct_trips.sql
 │       ├── dim_date.sql
