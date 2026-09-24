@@ -1,0 +1,83 @@
+version: 2
+
+models:
+  - name: int_trips_enriched
+    description: "Trips enriched with pickup/dropoff zone names and derived time-based fields (duration, hour, day of week)."
+    columns:
+      - name: vendor_id
+        description: "Code for the TPEP provider that provided the record."
+
+      - name: pickup_datetime
+        description: "Date and time when the meter was engaged."
+
+      - name: dropoff_datetime
+        description: "Date and time when the meter was disengaged."
+
+      - name: passenger_count
+        description: "Number of passengers in the vehicle."
+
+      - name: trip_distance
+        description: "Elapsed trip distance in miles."
+
+      - name: rate_code
+        description: "Final rate code in effect at the end of the trip."
+
+      - name: store_and_fwd_flag
+        description: "Whether the trip record was held in vehicle memory before sending to the vendor."
+        
+      - name: pickup_location_id
+        description: "TLC Taxi Zone ID where the trip started."
+
+      - name: dropoff_location_id
+        description: "TLC Taxi Zone ID where the trip ended."
+
+      - name: payment_type
+        description: "payment code - How the passenger paid for the trip."
+
+      - name: payment_type_desc
+        description: "How the passenger paid for the trip"
+        
+      - name: pickup_borough
+        description: "Borough of the pickup zone, joined from the taxi zone lookup."
+
+      - name: pickup_zone
+        description: "Name of the pickup zone, joined from the taxi zone lookup."
+
+      - name: dropoff_borough
+        description: "Borough of the dropoff zone, joined from the taxi zone lookup."
+
+      - name: dropoff_zone
+        description: "Name of the dropoff zone, joined from the taxi zone lookup."
+      
+      - name: fare_amount
+        description: "Time-and-distance fare calculated by the meter."
+
+      - name: extra
+        description: "Miscellaneous extras and surcharges."
+
+      - name: mta_tax
+        description: "Tax automatically triggered based on the metered rate in use."
+
+      - name: tip_amount
+        description: "Tip amount (credit card tips only; cash tips not included)."
+
+      - name: tolls_amount
+        description: "Total amount of all tolls paid in trip."
+
+      - name: improvement_surcharge
+        description: "Improvement surcharge assessed on hailed trips."
+
+      - name: airport_fee
+        description: "Airport pickup/drop-off fee, where applicable."
+
+      - name: total_amount
+        description: "Total amount charged to passengers, not including cash tips."
+
+      - name: trip_duration_minutes
+        description: "Trip duration in minutes, calculated as the difference between dropoff and pickup timestamps."
+
+      - name: pickup_hour
+        description: "Hour of day (0-23) the trip started, extracted from pickup_datetime."
+
+      - name: pickup_day_of_week
+        description: "Day of week the trip started (1=Sunday through 7=Saturday, per BigQuery's EXTRACT convention)."

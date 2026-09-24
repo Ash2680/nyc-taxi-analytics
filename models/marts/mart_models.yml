@@ -1,0 +1,177 @@
+version: 2
+
+models:
+  - name: fct_trips
+    description: "Fact table at the grain of one row per taxi trip."
+    columns:
+      - name: trip_id
+        description: "Surrogate key, generated from vendor_id, pickup_datetime, pickup_location_id, and dropoff_location_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: vendor_id
+        description: "Code for the TPEP provider that provided the record."
+
+      - name: pickup_datetime
+        description: "Date and time when the meter was engaged."
+        tests:
+          - not_null
+
+      - name: dropoff_datetime
+        description: "Date and time when the meter was disengaged."
+        tests:
+          - not_null
+
+      - name: pickup_date
+        description: "Pickup date only, cast from pickup_datetime. Foreign key to dim_date."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_day
+
+      - name: pickup_location_id
+        description: "Foreign key to dim_location, representing where the trip started."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_location')
+              field: location_id
+
+      - name: dropoff_location_id
+        description: "Foreign key to dim_location, representing where the trip ended."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_location')
+              field: location_id
+
+      - name: payment_type
+        description: "Payment code - How the passenger paid for the trip."
+
+      - name: payment_type_desc
+        description: "How the passenger paid for the trip"
+
+      - name: rate_code
+        description: "Final rate code in effect at the end of the trip."
+
+      - name: store_and_fwd_flag
+        description: "Whether the trip record was held in vehicle memory before sending to the vendor."
+
+      - name: passenger_count
+        description: "Number of passengers in the vehicle."
+
+      - name: trip_distance
+        description: "Elapsed trip distance in miles."
+
+      - name: trip_duration_minutes
+        description: "Trip duration in minutes, calculated as the difference between dropoff and pickup timestamps."
+
+      - name: pickup_hour
+        description: "Hour of day (0-23) the trip started, extracted from pickup_datetime."
+
+      - name: pickup_day_of_week
+        description: "Day of week the trip started (1=Sunday through 7=Saturday, per BigQuery's EXTRACT convention)."
+
+      - name: fare_amount
+        description: "Time-and-distance fare calculated by the meter."
+
+      - name: extra
+        description: "Miscellaneous extras and surcharges."
+
+      - name: mta_tax
+        description: "Tax automatically triggered based on the metered rate in use."
+
+      - name: tip_amount
+        description: "Tip amount (credit card tips only; cash tips not included)."
+
+      - name: tolls_amount
+        description: "Total amount of all tolls paid in trip."
+
+      - name: improvement_surcharge
+        description: "Improvement surcharge assessed on hailed trips."
+
+      - name: airport_fee
+        description: "Airport pickup/drop-off fee, where applicable."
+
+      - name: total_amount
+        description: "Total amount charged to passengers, not including cash tips."
+
+  - name: dim_location
+    description: "Dimension table with one row per NYC taxi zone."
+    columns:
+      - name: location_id
+        description: "Unique identifier for a taxi zone, from the TLC zone lookup."
+        tests:
+          - unique
+          - not_null
+
+      - name: borough
+        description: "NYC borough the zone belongs to."
+
+      - name: zone
+        description: "Name of the taxi zone."
+
+      - name: service_zone
+        description: "Broader service zone classification (e.g. Boro Zone, Yellow Zone, EWR)."
+
+  - name: dim_date
+    description: "Dimension table with one row per calendar day."
+    columns:
+      - name: date_day
+        description: "The calendar date."
+        tests:
+          - unique
+          - not_null
+
+      - name: year
+        description: "Calendar year."
+
+      - name: month
+        description: "Calendar month (1-12)."
+
+      - name: day
+        description: "Day of month."
+
+      - name: day_of_week
+        description: "Day of week (1=Sunday through 7=Saturday, per BigQuery's EXTRACT convention)."
+
+      - name: day_name
+        description: "Full name of the day (e.g. Monday)."
+
+      - name: month_name
+        description: "Full name of the month (e.g. January)."
+
+      - name: quarter
+        description: "Calendar quarter (1-4)."
+
+      - name: is_weekend
+        description: "Boolean flag, true if the date falls on Saturday or Sunday."
+
+  - name: rpt_trips_daily_summary
+    description: "Pre-aggregated reporting table (not a fact table) summarizing fct_trips by date, pickup borough, and payment type. Sources from fct_trips to inherit its deduplication logic as the single source of truth, joining dim_location for borough names."
+    columns:
+      - name: pickup_date
+        description: "The calendar date."
+
+      - name: pickup_borough
+        description: "Pickup borough, joined from dim_location upstream in int_trips_enriched."
+
+      - name: payment_type_desc
+        description: "How the passenger paid for the trip"
+
+      - name: trip_count
+        description: "Number of trips in this date/borough/payment_type group."
+      
+      - name: total_revenue
+        description: "Sum of total_amount for this group."
+      
+      - name: avg_fare
+        description: "Average fare_amount for this group."
+      
+      - name: avg_duration_minutes
+        description: "Average trip_duration_minutes for this group."
+      
+      - name: avg_distance
+        description: "Average trip_distance for this group."
