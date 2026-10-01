@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: raw_taxi
-    database: dbt-taxi-analytics
+    database: ash-analytics-portfolio
     schema: raw_taxi
     tables:
       - name: yellow_trips
